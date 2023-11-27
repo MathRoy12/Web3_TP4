@@ -14,6 +14,8 @@ public class Voyage
 
     [JsonIgnore] public virtual List<User> Proprietaires { get; set; } = new List<User>();
 
+    public virtual List<Photo> Photos { get; set; } = new List<Photo>();
+
     public Voyage()
     {
     }

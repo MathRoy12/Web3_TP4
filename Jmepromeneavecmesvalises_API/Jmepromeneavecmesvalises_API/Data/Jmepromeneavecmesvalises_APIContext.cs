@@ -139,5 +139,6 @@ namespace Jmepromeneavecmesvalises_API.Data
         }
 
         public DbSet<Voyage> Voyage { get; set; } = default!;
+        public DbSet<Photo> Photos { get; set; } = default!;
     }
 }
