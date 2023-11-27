@@ -1,0 +1,41 @@
+<div class="cards">
+  <div class="flex" *ngIf="localStorage['token'] != undefined">
+    <div class="formCard">
+      <h2>Crée toi un voyage</h2>
+      <form>
+        <div class="formContent">
+          <label for="destination">Destination</label>
+          <input [(ngModel)]="newVoyage.destination" type="text" id="destination" name="destination">
+        </div>
+
+        <div class="formContent">
+          <label for="image">Image (facultatif)</label>
+          <textarea [(ngModel)]="newVoyage.img" id="image" name="image"></textarea>
+        </div>
+
+        <div class="formContent">
+          <label for="public">Public</label>
+          <input [(ngModel)]="newVoyage.isPublic" type="checkbox" id="public" name="public">
+        </div>
+
+        <button (click)="creerVoyage()">Créer</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="card" *ngFor="let i of voyages">
+    <img class="icon delete" (click)="delete(i.id)" *ngIf="i.isOwner" src="assets/delete.svg" alt="trucmuch">
+    <img class="icon share" (click)="showModal(i.id)" *ngIf="i.isOwner" src="assets/share.svg" alt="trucmuch">
+    <h3>{{i.destination}}</h3>
+    <img [src]="i.img" alt="{{i.destination}}">
+  </div>
+</div>
+
+<div id="modal">
+  <img class="icon delete" (click)="closeModal()" src="assets/delete-rose.svg" alt="trucmuch">
+  <form>
+    <label for="email">Email de l'usager</label>
+    <input [(ngModel)]="shareUserEmail" type="text" id="email" name="email">
+    <button (click)="share()">Partager</button>
+  </form>
+</div>

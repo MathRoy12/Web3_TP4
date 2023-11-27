@@ -1,0 +1,16 @@
+<div class="flex">
+  <div class="card">
+    <h1>Connection</h1>
+    <form>
+      <div class="formContent">
+        <label for="Email">Email</label>
+        <input [(ngModel)]="email" type="text" id="Email" name="Email">
+      </div>
+      <div class="formContent">
+        <label for="Password">Password</label>
+        <input [(ngModel)]="password" type="password" id="Password" name="Password">
+      </div>
+      <button (click)="Submit()">submit</button>
+    </form>
+  </div>
+</div>

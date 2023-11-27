@@ -1,0 +1,20 @@
+<div class="flex">
+  <div class="card">
+    <h1>Enregistrement</h1>
+    <form>
+      <div class="formContent">
+        <label for="Email">Email</label>
+        <input [(ngModel)]="email" type="text" id="Email" name="Email">
+      </div>
+      <div class="formContent">
+        <label for="Password">Password</label>
+        <input [(ngModel)]="password" type="password" id="Password" name="Password">
+      </div>
+      <div class="formContent">
+        <label for="Confirm">Confirm</label>
+        <input [(ngModel)]="confirmPassword" type="password" id="Confirm" name="Confirm">
+      </div>
+      <button (click)="Submit()">submit</button>
+    </form>
+  </div>
+</div>
