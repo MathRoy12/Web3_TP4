@@ -7,4 +7,5 @@ public class Photo
     public string MimeType { get; set; } = "";
     
     public int VoyageId { get; set; }
+    public virtual Voyage Voyage { get; set; }
 }

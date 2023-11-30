@@ -7,11 +7,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Jmepromeneavecmesvalises_API.Data;
 using Jmepromeneavecmesvalises_API.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 
 namespace Jmepromeneavecmesvalises_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class PhotosController : ControllerBase
     {
         private readonly Jmepromeneavecmesvalises_APIContext _context;
@@ -21,48 +24,63 @@ namespace Jmepromeneavecmesvalises_API.Controllers
             _context = context;
         }
 
-        // GET: api/Photos
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Photo>>> GetPhotos()
-        {
-          if (_context.Photos == null)
-          {
-              return NotFound();
-          }
-            return await _context.Photos.ToListAsync();
-        }
-
         // GET: api/Photos/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Photo>> GetPhoto(int id)
+        public async Task<ActionResult> GetPhoto(int id)
         {
-          if (_context.Photos == null)
-          {
-              return NotFound();
-          }
-            var photo = await _context.Photos.FindAsync(id);
+            if (_context.Photos == null)
+            {
+                return NotFound();
+            }
+
+            Photo? photo = await _context.Photos.FindAsync(id);
 
             if (photo == null)
             {
                 return NotFound();
             }
 
-            return photo;
+            byte[] bytes = System.IO.File.ReadAllBytes("C:\\image\\" + photo.Filename);
+            return File(bytes, photo.MimeType);
         }
 
         // POST: api/Photos
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Photo>> PostPhoto(Photo photo)
+        [HttpPost("{id}")]
+        [DisableRequestSizeLimit]
+        public async Task<ActionResult<Photo>> PostPhoto(int id)
         {
-          if (_context.Photos == null)
-          {
-              return Problem("Entity set 'Jmepromeneavecmesvalises_APIContext.Photos'  is null.");
-          }
-            _context.Photos.Add(photo);
-            await _context.SaveChangesAsync();
+            try
+            {
+                IFormCollection formCollection = await Request.ReadFormAsync();
+                IFormFile? file = formCollection.Files.GetFile("monImage");
 
-            return CreatedAtAction("GetPhoto", new { id = photo.Id }, photo);
+                if (file != null)
+                {
+                    Image image = Image.Load(file.OpenReadStream());
+                    Photo photo = new Photo();
+
+                    photo.Filename = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                    photo.MimeType = file.ContentType;
+                    photo.Voyage = await _context.Voyage.FindAsync(id);
+
+                    Directory.CreateDirectory("C:\\image");
+                    await image.SaveAsync("C:\\image\\" + photo.Filename);
+
+                    await _context.Photos.AddAsync(photo);
+                    await _context.SaveChangesAsync();
+                }
+                else
+                {
+                    return NotFound(new { Message = "Aucune image fournie" });
+                }
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e);
+            }
+
+            return Ok();
         }
 
         // DELETE: api/Photos/5
@@ -73,6 +91,7 @@ namespace Jmepromeneavecmesvalises_API.Controllers
             {
                 return NotFound();
             }
+
             var photo = await _context.Photos.FindAsync(id);
             if (photo == null)
             {
