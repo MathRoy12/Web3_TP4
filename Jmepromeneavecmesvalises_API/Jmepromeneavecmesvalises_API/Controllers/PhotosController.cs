@@ -1,18 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Jmepromeneavecmesvalises_API.Data;
 using Jmepromeneavecmesvalises_API.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 
 namespace Jmepromeneavecmesvalises_API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     [Authorize]
     public class PhotosController : ControllerBase
@@ -98,6 +91,8 @@ namespace Jmepromeneavecmesvalises_API.Controllers
                 return NotFound();
             }
 
+            System.IO.File.Delete("C:\\image\\" + photo.Filename);
+            
             _context.Photos.Remove(photo);
             await _context.SaveChangesAsync();
 

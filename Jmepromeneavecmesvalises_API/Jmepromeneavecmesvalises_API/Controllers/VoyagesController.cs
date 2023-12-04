@@ -111,7 +111,7 @@ namespace Jmepromeneavecmesvalises_API.Controllers
                 return BadRequest();
             
             voyage.Destination = DTO.Destination;
-            voyage.Img = DTO.Img;
+            voyage.Couverture = DTO.Img;
             voyage.IsPublic = DTO.IsPublic;
 
             if (DTO.NewUserEmail == null)

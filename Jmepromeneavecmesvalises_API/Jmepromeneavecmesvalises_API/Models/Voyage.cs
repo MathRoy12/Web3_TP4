@@ -8,7 +8,7 @@ public class Voyage
 
     public string Destination { get; set; }
 
-    public string Img { get; set; }
+    public Photo Couverture { get; set; }
 
     public bool IsPublic { get; set; }
 
@@ -24,7 +24,7 @@ public class Voyage
     {
         Id = voyageDTO.Id;
         Destination = voyageDTO.Destination;
-        Img = voyageDTO.Img;
+        Couverture = voyageDTO.Couverture;
         IsPublic = voyageDTO.IsPublic;
     }
 }
