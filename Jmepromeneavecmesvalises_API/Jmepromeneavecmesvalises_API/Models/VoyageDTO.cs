@@ -6,7 +6,7 @@ public class VoyageDTO
 
     public string Destination { get; set; }
 
-    public Photo Couverture { get; set; }
+    public Couverture Couverture { get; set; }
 
     public bool IsPublic { get; set; }
     public bool IsOwner { get; set; }

@@ -6,7 +6,7 @@ public class PutVoyageDTO
 
     public string Destination { get; set; }
 
-    public string Img { get; set; }
+    public Couverture Couverture { get; set; }
 
     public bool IsPublic { get; set; }
     

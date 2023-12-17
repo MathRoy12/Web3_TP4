@@ -39,9 +39,9 @@ namespace Jmepromeneavecmesvalises_API.Controllers
 
         // POST: api/Photos
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost("{id}")]
+        [HttpPost("{voyageId}")]
         [DisableRequestSizeLimit]
-        public async Task<ActionResult<Photo>> PostPhoto(int id)
+        public async Task<ActionResult<Photo>> PostPhoto(int voyageId)
         {
             try
             {
@@ -55,7 +55,7 @@ namespace Jmepromeneavecmesvalises_API.Controllers
 
                     photo.Filename = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
                     photo.MimeType = file.ContentType;
-                    photo.Voyage = await _context.Voyage.FindAsync(id);
+                    photo.Voyage = await _context.Voyage.FindAsync(voyageId);
 
                     Directory.CreateDirectory("C:\\image");
                     await image.SaveAsync("C:\\image\\" + photo.Filename);

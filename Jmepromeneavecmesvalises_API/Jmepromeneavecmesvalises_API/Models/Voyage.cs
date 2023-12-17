@@ -7,9 +7,8 @@ public class Voyage
     public int Id { get; set; }
 
     public string Destination { get; set; }
-
-    public Photo Couverture { get; set; }
-
+    
+    public virtual Couverture Couverture { get; set; }
     public bool IsPublic { get; set; }
 
     [JsonIgnore] public virtual List<User> Proprietaires { get; set; } = new List<User>();
@@ -25,6 +24,13 @@ public class Voyage
         Id = voyageDTO.Id;
         Destination = voyageDTO.Destination;
         Couverture = voyageDTO.Couverture;
+        IsPublic = voyageDTO.IsPublic;
+    }
+    
+    public Voyage(PostVoyageDTO voyageDTO)
+    {
+        Id = voyageDTO.Id;
+        Destination = voyageDTO.Destination;
         IsPublic = voyageDTO.IsPublic;
     }
 }
