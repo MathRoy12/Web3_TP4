@@ -9,8 +9,8 @@
         </div>
 
         <div class="formContent">
-          <label for="image">Image (facultatif)</label>
-          <textarea [(ngModel)]="newVoyage.img" id="image" name="image"></textarea>
+          <label for="image">Couverture</label>
+          <input #fileUpload type="file" name="image" id="image" accept="image/*">
         </div>
 
         <div class="formContent">
@@ -27,7 +27,8 @@
     <img class="icon delete" (click)="delete(i.id)" *ngIf="i.isOwner" src="assets/delete.svg" alt="trucmuch">
     <img class="icon share" (click)="showModal(i.id)" *ngIf="i.isOwner" src="assets/share.svg" alt="trucmuch">
     <h3>{{i.destination}}</h3>
-    <img [src]="i.img" alt="{{i.destination}}">
+    <img src="https://localhost:7023/api/Couvertures/{{i.id}}" alt="{{i.destination}}">
+    <button (click)="infoVoyage(i.id)">info</button>
   </div>
 </div>
 

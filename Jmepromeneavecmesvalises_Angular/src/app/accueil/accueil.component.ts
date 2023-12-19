@@ -1,6 +1,7 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {HttpService} from "../http.service";
 import {ShareDTO, Voyage} from "../Voyage";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-accueil',
@@ -9,11 +10,14 @@ import {ShareDTO, Voyage} from "../Voyage";
 })
 export class AccueilComponent implements OnInit {
   voyages: Voyage[] = [];
-  newVoyage: Voyage = new Voyage(0, '', '', false, true);
+  newVoyage: Voyage = new Voyage(0, '',false, true);
   shareVoyageId: number = 0;
   shareUserEmail:string = '';
 
-  constructor(public http: HttpService) {
+  @ViewChild('fileUpload',{static:false}) fileUpload: any;
+
+  constructor(public http: HttpService,
+              public router:Router) {
   }
 
 
@@ -22,12 +26,12 @@ export class AccueilComponent implements OnInit {
   }
 
   async creerVoyage() {
-    if (this.newVoyage.img.trim() == "") {
-      this.newVoyage.img = "https://pbs.twimg.com/profile_images/1034857726814441479/-uDIzZ5O_400x400.jpg";
-    }
-    let res: Voyage = await this.http.CreerNouveauVoyage(this.newVoyage)
+    let formdata = new FormData();
+    formdata.append('monImage', this.fileUpload.nativeElement.files[0]);
+
+    let res: Voyage = await this.http.CreerNouveauVoyage(this.newVoyage,formdata)
     this.voyages.push(res);
-    this.newVoyage = new Voyage(0, '', '', false, true);
+    this.newVoyage = new Voyage(0, '', false, true);
   }
 
   async delete(id: number) {
@@ -50,13 +54,17 @@ export class AccueilComponent implements OnInit {
 
   async share() {
     let voyage:Voyage = <Voyage>this.voyages.find(v => v.id == this.shareVoyageId)
-    let dto = new ShareDTO(voyage.id, voyage.img, voyage.destination, voyage.isPublic,this.shareUserEmail);
+    let dto = new ShareDTO(voyage.id, voyage.destination, voyage.isPublic,this.shareUserEmail);
     await this.http.share(dto);
     location.reload();
 
     let modal = document.getElementById("modal");
     if (modal != null)
       modal.style.display = "none";
+  }
+
+  infoVoyage(id:number){
+    this.router.navigate(['/Voyage',id]);
   }
 
   protected readonly localStorage = localStorage;

@@ -4,6 +4,7 @@ using Jmepromeneavecmesvalises_API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Jmepromeneavecmesvalises_API.Migrations
 {
     [DbContext(typeof(Jmepromeneavecmesvalises_APIContext))]
-    partial class Jmepromeneavecmesvalises_APIContextModelSnapshot : ModelSnapshot
+    [Migration("20231218191759_trucmuche")]
+    partial class trucmuche
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -147,15 +150,15 @@ namespace Jmepromeneavecmesvalises_API.Migrations
                         {
                             Id = "fc647606-84c1-11ee-b9d1-0242ac120002",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "f9acea9a-8432-4779-aebf-fd305f1808d4",
+                            ConcurrencyStamp = "8b0a0e23-9bd3-4440-b7be-607ce03188aa",
                             Email = "admin@test.org",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@TEST.ORG",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAECgb09ngmio+v9QUdvt9zinzyzNnmiwivyxwArio+eg6oQPclPZ22ChLB6JXAHHAwg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEBvWo1S235zFG8l5pQ6xPlwGgN6XNH6vy1TxBSs4zj4MI/A+IMdyW+p4UHO3czEAJw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "0a43dd0b-88d0-4e08-95c4-7780bdb519aa",
+                            SecurityStamp = "ebc769d5-3e60-4da4-a930-79b1b1540249",
                             TwoFactorEnabled = false,
                             UserName = "Admin"
                         },
@@ -163,15 +166,15 @@ namespace Jmepromeneavecmesvalises_API.Migrations
                         {
                             Id = "fc647c64-84c1-11ee-b9d1-0242ac120002",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "10801b37-ad7f-4861-b176-da3edfd7c57f",
+                            ConcurrencyStamp = "b0ec0d25-9d02-45a1-ae7e-d27438f4342e",
                             Email = "moi@test.org",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedEmail = "MOI@TEST.ORG",
                             NormalizedUserName = "MOI",
-                            PasswordHash = "AQAAAAIAAYagAAAAEHVXhHeu9M1C/9SYJ58Nyny5U+6gnK4O9RjK7oqiWYQPKbV/W5U3nzfSvpwHnIyhzg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMTAIIAt94FQzjpH4snKcwb/WZWsLCEsuZFtSNUTXciE12pf4zPGcHLBNHX5OPR1Kw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "639d657d-fbed-4639-880a-5db8a8596bab",
+                            SecurityStamp = "5e1abdcd-d277-4c4b-9943-55771e590345",
                             TwoFactorEnabled = false,
                             UserName = "Moi"
                         },
@@ -179,15 +182,15 @@ namespace Jmepromeneavecmesvalises_API.Migrations
                         {
                             Id = "fc647608-84c1-11ee-b9d1-0242ac120002",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "36d9492b-9e26-4265-93cc-af29ae9a16dc",
+                            ConcurrencyStamp = "8aba8281-ba81-45b0-b349-f222c5500327",
                             Email = "toi@test.org",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedEmail = "TOI@TEST.ORG",
                             NormalizedUserName = "TOI",
-                            PasswordHash = "AQAAAAIAAYagAAAAECXSBW89wP/XmpTxiwL75l1gzVFy0rKJmdl9TOEFRemTI6yu+zoNjVo2hERVNyG4mw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEJpvKyviPaXSAqe9H/3lJfJNfSVqBBl/IVy9Ehrzq7kTQVjZ+QOvOHHLzDxKer68uQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "c50096da-169d-4572-83cd-790db5794372",
+                            SecurityStamp = "e07ccfb6-7281-4d18-8246-dc10c3d46859",
                             TwoFactorEnabled = false,
                             UserName = "Toi"
                         });
@@ -451,7 +454,8 @@ namespace Jmepromeneavecmesvalises_API.Migrations
 
             modelBuilder.Entity("Jmepromeneavecmesvalises_API.Models.Voyage", b =>
                 {
-                    b.Navigation("Couverture");
+                    b.Navigation("Couverture")
+                        .IsRequired();
 
                     b.Navigation("Photos");
                 });

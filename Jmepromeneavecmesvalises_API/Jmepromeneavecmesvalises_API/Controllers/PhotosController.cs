@@ -1,16 +1,19 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Jmepromeneavecmesvalises_API.Data;
 using Jmepromeneavecmesvalises_API.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace Jmepromeneavecmesvalises_API.Controllers
 {
-    [Route("api/[controller]/[action]")]
+    [Route("api/[controller]")]
     [ApiController]
     [Authorize]
     public class PhotosController : ControllerBase
     {
         private readonly Jmepromeneavecmesvalises_APIContext _context;
+        private User? user;
 
         public PhotosController(Jmepromeneavecmesvalises_APIContext context)
         {
@@ -27,7 +30,7 @@ namespace Jmepromeneavecmesvalises_API.Controllers
             }
 
             Photo? photo = await _context.Photos.FindAsync(id);
-
+            
             if (photo == null)
             {
                 return NotFound();
@@ -43,6 +46,17 @@ namespace Jmepromeneavecmesvalises_API.Controllers
         [DisableRequestSizeLimit]
         public async Task<ActionResult<Photo>> PostPhoto(int voyageId)
         {
+            Voyage? voyage = await _context.Voyage.FindAsync(voyageId);
+            
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            user = await _context.Users.FindAsync(userId);
+
+            if (!voyage.Proprietaires.Contains(user))
+            {
+                return StatusCode(StatusCodes.Status401Unauthorized,
+                    new { Message = "la voyage n'apartient pas a cette utilisateur" });
+            }
+            
             try
             {
                 IFormCollection formCollection = await Request.ReadFormAsync();
@@ -55,7 +69,7 @@ namespace Jmepromeneavecmesvalises_API.Controllers
 
                     photo.Filename = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
                     photo.MimeType = file.ContentType;
-                    photo.Voyage = await _context.Voyage.FindAsync(voyageId);
+                    photo.Voyage = voyage;
 
                     Directory.CreateDirectory("C:\\image");
                     await image.SaveAsync("C:\\image\\" + photo.Filename);
@@ -90,6 +104,15 @@ namespace Jmepromeneavecmesvalises_API.Controllers
             {
                 return NotFound();
             }
+            
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            user = await _context.Users.FindAsync(userId);
+            
+            if (!photo.Voyage.Proprietaires.Contains(user))
+            {
+                return StatusCode(StatusCodes.Status401Unauthorized,
+                    new { Message = "la voyage n'apartient pas a cette utilisateur" });
+            }
 
             System.IO.File.Delete("C:\\image\\" + photo.Filename);
             
@@ -97,11 +120,6 @@ namespace Jmepromeneavecmesvalises_API.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
-        }
-
-        private bool PhotoExists(int id)
-        {
-            return (_context.Photos?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

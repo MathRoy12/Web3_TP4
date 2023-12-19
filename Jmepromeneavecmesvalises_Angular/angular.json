@@ -30,9 +30,15 @@
               "src/assets"
             ],
             "styles": [
+              "./node_modules/@glidejs/glide/dist/css/glide.core.min.css",
+              "./node_modules/@glidejs/glide/dist/css/glide.theme.min.css",
               "src/styles.scss"
             ],
-            "scripts": []
+            "scripts": [
+              "./node_modules/@glidejs/glide/dist/glide.min.js",
+              "./node_modules/imagesloaded/imagesloaded.pkgd.min.js",
+              "./node_modules/masonry-layout/dist/masonry.pkgd.min.js"
+            ]
           },
           "configurations": {
             "production": {

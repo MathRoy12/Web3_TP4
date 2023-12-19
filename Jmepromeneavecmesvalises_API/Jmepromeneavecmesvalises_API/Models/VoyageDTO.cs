@@ -1,13 +1,12 @@
-﻿namespace Jmepromeneavecmesvalises_API.Models;
+﻿using System.Text.Json.Serialization;
+
+namespace Jmepromeneavecmesvalises_API.Models;
 
 public class VoyageDTO
 {
     public int Id { get; set; }
 
     public string Destination { get; set; }
-
-    public Couverture Couverture { get; set; }
-
     public bool IsPublic { get; set; }
     public bool IsOwner { get; set; }
 
@@ -19,7 +18,6 @@ public class VoyageDTO
     {
         Id = voyage.Id;
         Destination = voyage.Destination;
-        Couverture = voyage.Couverture;
         IsPublic = voyage.IsPublic;
         IsOwner = isOwner;
     }

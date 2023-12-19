@@ -29,8 +29,14 @@ export class HttpService {
     return res;
   }
 
-  async CreerNouveauVoyage(voyage:Voyage){
+  async GetVoyageById(id:number):Promise<Voyage>{
+    let res :Voyage = await lastValueFrom(this.http.get<Voyage>(this.domain + "api/Voyages/" + id.toString()));
+    return res;
+  }
+
+  async CreerNouveauVoyage(voyage:Voyage,formDate:FormData){
     let res:Voyage = await lastValueFrom(this.http.post<Voyage>(this.domain + "api/Voyages", voyage));
+    let res2 = await lastValueFrom(this.http.post(this.domain + "api/Couvertures/" + res.id.toString(), formDate));
     return res;
   }
 
@@ -40,5 +46,13 @@ export class HttpService {
 
   async share(DTO:ShareDTO){
     await lastValueFrom(this.http.put(this.domain + "api/Voyages/" + DTO.id.toString(),DTO))
+  }
+
+  async editCouverture(formDate:FormData,voyageId:number){
+    await lastValueFrom(this.http.put(this.domain + "api/Couvertures/" + voyageId.toString(), formDate));
+  }
+
+  async ajoutPhoto(formDate:FormData,voyageId:number){
+    await lastValueFrom(this.http.post(this.domain + "api/Photos/" + voyageId.toString(), formDate));
   }
 }

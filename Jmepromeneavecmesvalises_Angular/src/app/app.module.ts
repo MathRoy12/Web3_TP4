@@ -9,13 +9,17 @@ import { AccueilComponent } from './accueil/accueil.component';
 import {HTTP_INTERCEPTORS, HttpClientModule} from "@angular/common/http";
 import {ElInterceptor} from "./el-interceptor.interceptor";
 import {FormsModule} from "@angular/forms";
+import { VoyageComponent } from './voyage/voyage.component';
+import { MasonryComponent } from './masonry/masonry.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     SignUpComponent,
     LogInComponent,
-    AccueilComponent
+    AccueilComponent,
+    VoyageComponent,
+    MasonryComponent
   ],
   imports: [
     BrowserModule,
@@ -25,6 +29,7 @@ import {FormsModule} from "@angular/forms";
       {path: 'SignUp', component: SignUpComponent},
       {path: 'LogIn', component: LogInComponent},
       {path: 'Accueil', component: AccueilComponent},
+      {path: 'Voyage/:id', component: VoyageComponent},
       {path: '**', redirectTo: '/Accueil', pathMatch: 'full'}
     ]),
     FormsModule,
