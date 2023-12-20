@@ -41,7 +41,6 @@ export class HttpService {
   }
 
   async delete(id:number){
-    await lastValueFrom(this.http.delete(this.domain + "api/Couvertures/" + id.toString()))
     await lastValueFrom(this.http.delete(this.domain + "api/Voyages/" + id.toString()))
   }
 

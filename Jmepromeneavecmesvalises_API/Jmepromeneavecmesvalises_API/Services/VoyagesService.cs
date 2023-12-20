@@ -7,12 +7,16 @@ namespace Jmepromeneavecmesvalises_API.Services;
 public class VoyagesService
 {
     private readonly Jmepromeneavecmesvalises_APIContext _context;
+    private readonly PhotosService _photosService;
+    private readonly CouverturesService _couverturesService;
 
-    public VoyagesService(Jmepromeneavecmesvalises_APIContext context)
+    public VoyagesService(Jmepromeneavecmesvalises_APIContext context, PhotosService photosService,
+        CouverturesService couverturesService)
     {
         _context = context;
+        _photosService = photosService;
+        _couverturesService = couverturesService;
     }
-
     public async Task<List<VoyageDTO>?> GetVoyage(User? user)
     {
         if (_context.Voyage == null)
@@ -79,8 +83,19 @@ public class VoyagesService
         {
             return;
         }
+
+        List<Photo> photos = voyage.Photos;
+
+        while(photos.Count > 0)
+        {
+            await _photosService.DeletePhoto(photos[0]);
+        }
+        
+        await _couverturesService.DeleteCouverture(voyage.Couverture);
+
         _context.Voyage.Remove(voyage);
         await _context.SaveChangesAsync();
+        
     }
 
     public bool VoyageExists(int id)

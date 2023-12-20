@@ -67,6 +67,7 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddScoped<PhotosService>();
 builder.Services.AddScoped<VoyagesService>();
+builder.Services.AddScoped<CouverturesService>();
 
 var app = builder.Build();
 
