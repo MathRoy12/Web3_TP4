@@ -2,6 +2,7 @@ using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Jmepromeneavecmesvalises_API.Data;
 using Jmepromeneavecmesvalises_API.Models;
+using Jmepromeneavecmesvalises_API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
@@ -63,6 +64,9 @@ builder.Services.AddCors(options =>
         builder.AllowAnyHeader();
     });
 });
+
+builder.Services.AddScoped<PhotosService>();
+builder.Services.AddScoped<VoyagesService>();
 
 var app = builder.Build();
 

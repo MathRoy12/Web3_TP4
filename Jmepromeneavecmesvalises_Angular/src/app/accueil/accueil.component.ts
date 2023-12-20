@@ -1,6 +1,6 @@
 import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {HttpService} from "../http.service";
-import {ShareDTO, Voyage} from "../Voyage";
+import {Photo, ShareDTO, Voyage} from "../Voyage";
 import {Router} from "@angular/router";
 
 @Component({
@@ -10,7 +10,7 @@ import {Router} from "@angular/router";
 })
 export class AccueilComponent implements OnInit {
   voyages: Voyage[] = [];
-  newVoyage: Voyage = new Voyage(0, '',false, true);
+  newVoyage: Voyage = new Voyage(0, '',new Photo(0,'',''),false, true);
   shareVoyageId: number = 0;
   shareUserEmail:string = '';
 
@@ -31,7 +31,7 @@ export class AccueilComponent implements OnInit {
 
     let res: Voyage = await this.http.CreerNouveauVoyage(this.newVoyage,formdata)
     this.voyages.push(res);
-    this.newVoyage = new Voyage(0, '', false, true);
+    this.newVoyage = new Voyage(0, '', new Photo(0,'',''), false, true);
   }
 
   async delete(id: number) {
@@ -54,7 +54,7 @@ export class AccueilComponent implements OnInit {
 
   async share() {
     let voyage:Voyage = <Voyage>this.voyages.find(v => v.id == this.shareVoyageId)
-    let dto = new ShareDTO(voyage.id, voyage.destination, voyage.isPublic,this.shareUserEmail);
+    let dto = new ShareDTO(voyage.id, voyage.destination, voyage.couverture, voyage.isPublic,this.shareUserEmail);
     await this.http.share(dto);
     location.reload();
 

@@ -1,4 +1,6 @@
-﻿namespace Jmepromeneavecmesvalises_API.Models;
+﻿using System.Text.Json.Serialization;
+
+namespace Jmepromeneavecmesvalises_API.Models;
 
 public class Couverture
 {
@@ -7,5 +9,6 @@ public class Couverture
     public string MimeType { get; set; } = "";
     
     public int VoyageId { get; set; }
-    public virtual Voyage Voyage { get; set; }
+    [JsonIgnore]
+    public virtual Voyage? Voyage { get; set; }
 }

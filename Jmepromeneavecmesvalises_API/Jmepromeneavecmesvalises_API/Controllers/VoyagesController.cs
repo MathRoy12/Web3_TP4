@@ -1,8 +1,8 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Jmepromeneavecmesvalises_API.Data;
 using Jmepromeneavecmesvalises_API.Models;
+using Jmepromeneavecmesvalises_API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 
@@ -13,14 +13,14 @@ namespace Jmepromeneavecmesvalises_API.Controllers;
 [Authorize]
 public class VoyagesController : ControllerBase
 {
-    private readonly Jmepromeneavecmesvalises_APIContext _context;
+    private readonly VoyagesService _service;
     private readonly UserManager<User> _userManager;
-    private User? user;
+    private User? _user;
 
-    public VoyagesController(Jmepromeneavecmesvalises_APIContext context, UserManager<User> userManager)
+    public VoyagesController(UserManager<User> userManager, VoyagesService service)
     {
-        _context = context;
         _userManager = userManager;
+        _service = service;
     }
 
     // GET: api/Voyages
@@ -28,32 +28,21 @@ public class VoyagesController : ControllerBase
     [AllowAnonymous]
     public async Task<ActionResult<IEnumerable<VoyageDTO>>> GetVoyage()
     {
-        if (_context.Voyage == null)
+        List<VoyageDTO>? data;
+
+        string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId != null)
+            _user = await _userManager.FindByIdAsync(userId);
+
+        if (await _service.GetVoyage(_user) == null)
         {
+            return Problem("Entity set 'Jmepromeneavecmesvalises_APIContext.Voyage'  is null.");
+        }
+
+        data = await _service.GetVoyage(_user);
+
+        if (data == null)
             return NotFound();
-        }
-
-        List<VoyageDTO> data = new List<VoyageDTO>();
-
-        string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        user = await _context.Users.FindAsync(userId);
-
-        if (user != null)
-        {
-            data.InsertRange(0,
-                await _context.Voyage
-                    .Where(v => v.Proprietaires.Contains(user) || v.IsPublic)
-                    .Select(v => new VoyageDTO(v, v.Proprietaires.Contains(user)))
-                    .ToListAsync()
-            );
-        }
-        else
-        {
-            data.InsertRange(0, await _context.Voyage
-                .Where(v => v.IsPublic)
-                .Select(v => new VoyageDTO(v, false))
-                .ToListAsync());
-        }
 
         return data;
     }
@@ -62,25 +51,26 @@ public class VoyagesController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<GetVoyageDTO>> GetVoyage(int id)
     {
-        if (_context.Voyage == null)
-        {
-            return NotFound();
-        }
-
-        Voyage voyage = await _context.Voyage.FindAsync(id);
-
-        string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        user = await _context.Users.FindAsync(userId);
-
-        if (!voyage.Proprietaires.Contains(user))
-        {
-            return StatusCode(StatusCodes.Status401Unauthorized,
-                new { Message = "la voyage n'apartient pas a cette utilisateur" });
-        }
+        Voyage? voyage = await _service.GetVoyage(id);
 
         if (voyage == null)
         {
             return NotFound();
+        }
+
+        string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId != null)
+            _user = await _userManager.FindByIdAsync(userId);
+
+        if (await _service.GetVoyage(_user) == null)
+        {
+            return Problem("Entity set 'Jmepromeneavecmesvalises_APIContext.Voyage'  is null.");
+        }
+
+        if (_user == null || !voyage.Proprietaires.Contains(_user))
+        {
+            return StatusCode(StatusCodes.Status401Unauthorized,
+                new { Message = "la voyage n'apartient pas a cette utilisateur" });
         }
 
         return new GetVoyageDTO(voyage);
@@ -89,48 +79,43 @@ public class VoyagesController : ControllerBase
     // PUT: api/Voyages/5
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutVoyage(int id, PutVoyageDTO DTO)
+    public async Task<IActionResult> PutVoyage(int id, PutVoyageDTO dto)
     {
-        if (id != DTO.Id)
+        if (id != dto.Id)
             return BadRequest();
 
-        string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        user = await _context.Users.FindAsync(userId);
+        string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId != null)
+            _user = await _userManager.FindByIdAsync(userId);
 
-        Voyage voyageOriginal = await _context.Voyage.FindAsync(id);
+        if (await _service.GetVoyage(_user) == null)
+        {
+            return Problem("Entity set 'Jmepromeneavecmesvalises_APIContext.Voyage'  is null.");
+        }
 
-        if (!voyageOriginal.Proprietaires.Contains(user))
+        Voyage? voyage = await _service.GetVoyage(id);
+
+        if (voyage == null)
+            return BadRequest();
+
+        if (_user == null || !voyage.Proprietaires.Contains(_user))
         {
             return StatusCode(StatusCodes.Status401Unauthorized,
                 new { Message = "la voyage n'apartient pas a cette utilisateur" });
         }
 
-        Voyage? voyage = await _context.Voyage.FindAsync(id);
-            
-        if (voyage == null)
+        if (dto.NewUserEmail == null)
             return BadRequest();
-            
-        voyage.Destination = DTO.Destination;
-        voyage.Couverture = DTO.Couverture;
-        voyage.IsPublic = DTO.IsPublic;
 
-        if (DTO.NewUserEmail == null)
-            return BadRequest();
-            
-        User? newUser = await _userManager.FindByEmailAsync(DTO.NewUserEmail);
-            
-        if (newUser != null)
-            voyage.Proprietaires.Add(newUser);
-
-        _context.Entry(voyage).State = EntityState.Modified;
+        User? newUser = await _userManager.FindByEmailAsync(dto.NewUserEmail);
 
         try
         {
-            await _context.SaveChangesAsync();
+            await _service.PutVoyage(id, voyage, dto, newUser);
         }
         catch (DbUpdateConcurrencyException)
         {
-            if (!VoyageExists(id))
+            if (!_service.VoyageExists(id))
                 return NotFound();
             else
                 throw;
@@ -142,30 +127,24 @@ public class VoyagesController : ControllerBase
     // POST: api/Voyages
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     [HttpPost]
-    public async Task<ActionResult<VoyageDTO>> PostVoyage(PostVoyageDTO DTO)
+    public async Task<ActionResult<VoyageDTO>> PostVoyage(PostVoyageDTO dto)
     {
-        if (_context.Voyage == null)
-        {
-            return Problem("Entity set 'Jmepromeneavecmesvalises_APIContext.Voyage'  is null.");
-        }
+        string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId != null)
+            _user = await _userManager.FindByIdAsync(userId);
 
-        string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        user = await _context.Users.FindAsync(userId);
-
-        if (user == null)
+        if (_user == null)
         {
             return StatusCode(StatusCodes.Status401Unauthorized,
                 new { Message = "Il n'y a aucun utilisateur de connecter" });
         }
 
-        Voyage voyage = new Voyage(DTO);
-        if (DTO.IsOwner)
+        if (await _service.GetVoyage(_user) == null)
         {
-            voyage.Proprietaires.Add(user);
+            return Problem("Entity set 'Jmepromeneavecmesvalises_APIContext.Voyage'  is null.");
         }
 
-        _context.Voyage.Add(voyage);
-        await _context.SaveChangesAsync();
+        Voyage voyage = await _service.PostVoyage(dto, _user);
 
         return new VoyageDTO(voyage, true);
     }
@@ -174,40 +153,35 @@ public class VoyagesController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteVoyage(int id)
     {
-        if (_context.Voyage == null)
-        {
-            return NotFound();
-        }
+        string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId != null)
+            _user = await _userManager.FindByIdAsync(userId);
 
-        string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        user = await _context.Users.FindAsync(userId);
-
-        if (user == null)
+        if (_user == null)
         {
             return StatusCode(StatusCodes.Status401Unauthorized,
                 new { Message = "Il n'y a aucun utilisateur de connecter" });
         }
 
-        var voyage = await _context.Voyage.FindAsync(id);
+        if (await _service.GetVoyage(_user) == null)
+        {
+            return Problem("Entity set 'Jmepromeneavecmesvalises_APIContext.Voyage'  is null.");
+        }
+
+        Voyage? voyage = await _service.GetVoyage(id);
         if (voyage == null)
         {
             return NotFound();
         }
 
-        if (!voyage.Proprietaires.Contains(user))
+        if (!voyage.Proprietaires.Contains(_user))
         {
             return StatusCode(StatusCodes.Status401Unauthorized,
                 new { Message = "Le voyage n'apartient pas a cet utilisateur" });
         }
 
-        _context.Voyage.Remove(voyage);
-        await _context.SaveChangesAsync();
+        await _service.DeleteVoyage(id);
 
         return NoContent();
-    }
-
-    private bool VoyageExists(int id)
-    {
-        return (_context.Voyage?.Any(e => e.Id == id)).GetValueOrDefault();
     }
 }
