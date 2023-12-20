@@ -1,6 +1,6 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {HttpService} from "../http.service";
-import {Voyage} from "../Voyage";
+import {getDTO, Voyage} from "../Voyage";
 import {ActivatedRoute} from "@angular/router";
 @Component({
   selector: 'app-voyage',
@@ -8,13 +8,14 @@ import {ActivatedRoute} from "@angular/router";
   styleUrls: ['./voyage.component.scss']
 })
 export class VoyageComponent implements OnInit {
-  voyage: Voyage;
+  voyage: getDTO;
+  photos: string[] = [];
   idVoyage: string | null = this.route.snapshot.paramMap.get("id");
   @ViewChild('couverture',{static:false}) couverture: any;
   @ViewChild('filePhoto',{static:false}) filePhoto: any;
   constructor(private http: HttpService,
               private route: ActivatedRoute) {
-    this.voyage = new Voyage(0, '', false, true);
+    this.voyage = new getDTO(0, '', []);
   }
 
   async ngOnInit() {
@@ -22,6 +23,9 @@ export class VoyageComponent implements OnInit {
       throw new Error("id is null");
     }
     this.voyage = await this.http.GetVoyageById(+this.idVoyage);
+    for (let photo of this.voyage.photos) {
+      this.photos.push("https://localhost:7023/api/Photos/" + photo.id.toString());
+    }
   }
 
   async editCouverture() {

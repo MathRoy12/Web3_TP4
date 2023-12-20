@@ -1,3 +1,8 @@
 <div class="grid" #masongrid>
-  <img [src]="i" #masongriditems class="grid-item" *ngFor="let i of images">
+  <img (click)="srcModal = i" [src]="i" #masongriditems class="grid-item" *ngFor="let i of images">
+</div>
+
+<div class="modal" *ngIf="srcModal != ''">
+  <img [src]="srcModal" alt="grosse image">
+  <img (click)="srcModal = ''" class="icon" src="assets/croix.svg" alt="titecroix">
 </div>

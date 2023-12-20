@@ -60,7 +60,7 @@ public class VoyagesController : ControllerBase
 
     // GET: api/Voyages/5
     [HttpGet("{id}")]
-    public async Task<ActionResult<VoyageDTO>> GetVoyage(int id)
+    public async Task<ActionResult<GetVoyageDTO>> GetVoyage(int id)
     {
         if (_context.Voyage == null)
         {
@@ -83,7 +83,7 @@ public class VoyagesController : ControllerBase
             return NotFound();
         }
 
-        return new VoyageDTO(voyage, true);
+        return new GetVoyageDTO(voyage);
     }
 
     // PUT: api/Voyages/5

@@ -186,8 +186,9 @@ namespace Jmepromeneavecmesvalises_API.Controllers
             {
                 return NotFound();
             }
-
-            Couverture photo = await _context.Couvertures.FindAsync(id);
+            
+            Voyage voyage = await _context.Voyage.FindAsync(id);
+            Couverture photo = voyage.Couverture;
             if (photo == null)
             {
                 return NotFound();
@@ -202,7 +203,7 @@ namespace Jmepromeneavecmesvalises_API.Controllers
                     new { Message = "la voyage n'apartient pas a cette utilisateur" });
             }
 
-            System.IO.File.Delete("C:\\image\\" + photo.Filename);
+            System.IO.File.Delete("C:\\image\\couvertures\\" + photo.Filename);
 
             _context.Couvertures.Remove(photo);
             await _context.SaveChangesAsync();

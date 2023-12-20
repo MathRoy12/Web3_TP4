@@ -16,6 +16,8 @@ export class MasonryComponent {
   @ViewChild('masongrid') masongrid?: ElementRef;
   @ViewChildren('masongriditems') masongriditems?: QueryList<any>;
 
+  srcModal: string = "";
+
   ngAfterViewInit() {
     if (this.masongriditems == null) {return;}
     this.masongriditems.changes.subscribe(e => {

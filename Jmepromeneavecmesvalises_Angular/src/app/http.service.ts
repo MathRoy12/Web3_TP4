@@ -3,7 +3,7 @@ import {RegisterDTO} from "./RegisterDTO";
 import {lastValueFrom} from "rxjs";
 import {HttpClient, HttpHandler} from "@angular/common/http";
 import {LoginDTO} from "./LoginDTO";
-import {ShareDTO, Voyage} from "./Voyage";
+import {getDTO, ShareDTO, Voyage} from "./Voyage";
 
 @Injectable({
   providedIn: 'root'
@@ -29,8 +29,8 @@ export class HttpService {
     return res;
   }
 
-  async GetVoyageById(id:number):Promise<Voyage>{
-    let res :Voyage = await lastValueFrom(this.http.get<Voyage>(this.domain + "api/Voyages/" + id.toString()));
+  async GetVoyageById(id:number):Promise<getDTO>{
+    let res :getDTO = await lastValueFrom(this.http.get<getDTO>(this.domain + "api/Voyages/" + id.toString()));
     return res;
   }
 
@@ -41,6 +41,7 @@ export class HttpService {
   }
 
   async delete(id:number){
+    await lastValueFrom(this.http.delete(this.domain + "api/Couvertures/" + id.toString()))
     await lastValueFrom(this.http.delete(this.domain + "api/Voyages/" + id.toString()))
   }
 

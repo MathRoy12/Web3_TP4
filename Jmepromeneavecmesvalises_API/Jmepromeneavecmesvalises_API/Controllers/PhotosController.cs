@@ -22,6 +22,7 @@ namespace Jmepromeneavecmesvalises_API.Controllers
 
         // GET: api/Photos/5
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public async Task<ActionResult> GetPhoto(int id)
         {
             if (_context.Photos == null)

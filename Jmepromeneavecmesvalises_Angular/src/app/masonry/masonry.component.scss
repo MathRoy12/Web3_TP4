@@ -1,4 +1,26 @@
 .grid-item {
   width: 315px;
   margin-bottom: 5px;
+  cursor: pointer;
+}
+
+
+.modal{
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0,0,0,0.8);
+
+  .icon{
+    position: fixed;
+    height: 30px;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+  }
 }
