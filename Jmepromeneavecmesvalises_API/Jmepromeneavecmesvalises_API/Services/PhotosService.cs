@@ -22,4 +22,29 @@ public class PhotosService
         
         return photo;
     }
+    
+    public async Task AddPhoto(IFormFile file, Voyage voyage)
+    {
+        Image image = await Image.LoadAsync(file.OpenReadStream());
+        Photo photo = new Photo
+        {
+            Filename = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName),
+            MimeType = file.ContentType,
+            Voyage = voyage
+        };
+
+        Directory.CreateDirectory("C:\\image");
+        await image.SaveAsync("C:\\image\\" + photo.Filename);
+
+        await _context.Photos.AddAsync(photo);
+        await _context.SaveChangesAsync();
+    }
+    
+    public async Task DeletePhoto(Photo photo)
+    {
+        File.Delete("C:\\image\\" + photo.Filename);
+
+        _context.Photos.Remove(photo);
+        await _context.SaveChangesAsync();
+    }
 }

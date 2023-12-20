@@ -56,4 +56,8 @@ export class HttpService {
   async ajoutPhoto(formDate:FormData,voyageId:number){
     await lastValueFrom(this.http.post(this.domain + "api/Photos/" + voyageId.toString(), formDate));
   }
+
+  async deletePhoto(id:number){
+    await lastValueFrom(this.http.delete(this.domain + "api/Photos/" + id.toString()))
+  }
 }

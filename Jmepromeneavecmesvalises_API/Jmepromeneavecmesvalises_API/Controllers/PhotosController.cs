@@ -1,9 +1,9 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
-using Jmepromeneavecmesvalises_API.Data;
 using Jmepromeneavecmesvalises_API.Models;
 using Jmepromeneavecmesvalises_API.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace Jmepromeneavecmesvalises_API.Controllers;
 
@@ -12,16 +12,16 @@ namespace Jmepromeneavecmesvalises_API.Controllers;
 [Authorize]
 public class PhotosController : ControllerBase
 {
-    private readonly Jmepromeneavecmesvalises_APIContext _context;
-    public PhotosService _photosService;
-    public VoyagesService _voyagesService;
-    private User? user;
+    private readonly PhotosService _photosService;
+    private readonly VoyagesService _voyagesService;
+    private readonly UserManager<User> _userManager;
+    private User? _user;
 
-    public PhotosController(Jmepromeneavecmesvalises_APIContext context, PhotosService service, VoyagesService voyagesService)
+    public PhotosController(PhotosService service, VoyagesService voyagesService, UserManager<User> userManager)
     {
-        _context = context;
         _photosService = service;
         _voyagesService = voyagesService;
+        _userManager = userManager;
     }
 
     // GET: api/Photos/5
@@ -29,13 +29,8 @@ public class PhotosController : ControllerBase
     [AllowAnonymous]
     public async Task<ActionResult> GetPhoto(int id)
     {
-        if (_context.Photos == null)
-        {
-            return NotFound();
-        }
-
         Photo? photo = await _photosService.GetPhoto(id);
-            
+
         if (photo == null)
         {
             return NotFound();
@@ -51,17 +46,24 @@ public class PhotosController : ControllerBase
     [DisableRequestSizeLimit]
     public async Task<ActionResult<Photo>> PostPhoto(int voyageId)
     {
-        Voyage? voyage = await _context.Voyage.FindAsync(voyageId);
-            
-        string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        user = await _context.Users.FindAsync(userId);
+        Voyage? voyage = await _voyagesService.GetVoyage(voyageId);
 
-        if (!voyage.Proprietaires.Contains(user))
+        if (voyage == null)
+        {
+            return StatusCode(StatusCodes.Status400BadRequest,
+                new { Message = "Aucun voyage avec cet id" });
+        }
+
+        string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId != null)
+            _user = await _userManager.FindByIdAsync(userId);
+
+        if (_user == null || !voyage.Proprietaires.Contains(_user))
         {
             return StatusCode(StatusCodes.Status401Unauthorized,
                 new { Message = "la voyage n'apartient pas a cette utilisateur" });
         }
-            
+
         try
         {
             IFormCollection formCollection = await Request.ReadFormAsync();
@@ -69,18 +71,7 @@ public class PhotosController : ControllerBase
 
             if (file != null)
             {
-                Image image = Image.Load(file.OpenReadStream());
-                Photo photo = new Photo();
-
-                photo.Filename = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-                photo.MimeType = file.ContentType;
-                photo.Voyage = voyage;
-
-                Directory.CreateDirectory("C:\\image");
-                await image.SaveAsync("C:\\image\\" + photo.Filename);
-
-                await _context.Photos.AddAsync(photo);
-                await _context.SaveChangesAsync();
+                await _photosService.AddPhoto(file, voyage);
             }
             else
             {
@@ -99,30 +90,23 @@ public class PhotosController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeletePhoto(int id)
     {
-        if (_context.Photos == null)
-        {
-            return NotFound();
-        }
-
-        var photo = await _context.Photos.FindAsync(id);
+        Photo? photo = await _photosService.GetPhoto(id);
         if (photo == null)
         {
             return NotFound();
         }
-            
-        string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        user = await _context.Users.FindAsync(userId);
-            
-        if (!photo.Voyage.Proprietaires.Contains(user))
+
+        string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId != null)
+            _user = await _userManager.FindByIdAsync(userId);
+
+        if (_user == null || !photo.Voyage.Proprietaires.Contains(_user))
         {
             return StatusCode(StatusCodes.Status401Unauthorized,
                 new { Message = "la voyage n'apartient pas a cette utilisateur" });
         }
 
-        System.IO.File.Delete("C:\\image\\" + photo.Filename);
-            
-        _context.Photos.Remove(photo);
-        await _context.SaveChangesAsync();
+        await _photosService.DeletePhoto(photo);
 
         return NoContent();
     }

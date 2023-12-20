@@ -1,4 +1,5 @@
 import { AfterViewInit, Component, ElementRef, Input, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import {HttpService} from "../http.service";
 
 declare var Masonry: any;
 declare var imagesLoaded: any;
@@ -10,13 +11,14 @@ declare var imagesLoaded: any;
 })
 export class MasonryComponent {
 
-  constructor() { }
+  constructor(public http:HttpService) { }
 
   @Input() images: string[] = [];
   @ViewChild('masongrid') masongrid?: ElementRef;
   @ViewChildren('masongriditems') masongriditems?: QueryList<any>;
 
   srcModal: string = "";
+  idModal: number = 0;
 
   ngAfterViewInit() {
     if (this.masongriditems == null) {return;}
@@ -43,4 +45,11 @@ export class MasonryComponent {
       msnry.layout();
     });
   }
+
+  imgClick(string: string) {
+    this.srcModal = string;
+    this.idModal = +string.split("/")[string.split("/").length - 1];
+  }
+
+  protected readonly location = location;
 }

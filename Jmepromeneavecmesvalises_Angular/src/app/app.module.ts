@@ -11,6 +11,7 @@ import {ElInterceptor} from "./el-interceptor.interceptor";
 import {FormsModule} from "@angular/forms";
 import { VoyageComponent } from './voyage/voyage.component';
 import { MasonryComponent } from './masonry/masonry.component';
+import {NgOptimizedImage} from "@angular/common";
 
 @NgModule({
   declarations: [
@@ -21,20 +22,21 @@ import { MasonryComponent } from './masonry/masonry.component';
     VoyageComponent,
     MasonryComponent
   ],
-  imports: [
-    BrowserModule,
-    RouterModule,
-    RouterModule.forRoot([
-      {path: '', redirectTo: '/Accueil', pathMatch: 'full'},
-      {path: 'SignUp', component: SignUpComponent},
-      {path: 'LogIn', component: LogInComponent},
-      {path: 'Accueil', component: AccueilComponent},
-      {path: 'Voyage/:id', component: VoyageComponent},
-      {path: '**', redirectTo: '/Accueil', pathMatch: 'full'}
-    ]),
-    FormsModule,
-    HttpClientModule
-  ],
+    imports: [
+        BrowserModule,
+        RouterModule,
+        RouterModule.forRoot([
+            {path: '', redirectTo: '/Accueil', pathMatch: 'full'},
+            {path: 'SignUp', component: SignUpComponent},
+            {path: 'LogIn', component: LogInComponent},
+            {path: 'Accueil', component: AccueilComponent},
+            {path: 'Voyage/:id', component: VoyageComponent},
+            {path: '**', redirectTo: '/Accueil', pathMatch: 'full'}
+        ]),
+        FormsModule,
+        HttpClientModule,
+        NgOptimizedImage
+    ],
   providers: [
     {provide:HTTP_INTERCEPTORS, useClass: ElInterceptor, multi: true}
   ],

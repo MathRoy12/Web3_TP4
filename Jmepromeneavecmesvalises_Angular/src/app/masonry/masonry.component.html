@@ -1,8 +1,9 @@
 <div class="grid" #masongrid>
-  <img (click)="srcModal = i" [src]="i" #masongriditems class="grid-item" *ngFor="let i of images">
+  <img #masongriditems (click)="imgClick(i)" *ngFor="let i of images" alt="truc" class="grid-item" [src]="i">
 </div>
 
 <div class="modal" *ngIf="srcModal != ''">
   <img [src]="srcModal" alt="grosse image">
   <img (click)="srcModal = ''" class="icon" src="assets/croix.svg" alt="titecroix">
+  <img (click)="srcModal = '';http.deletePhoto(idModal);location.reload()" class="icon delete" src="assets/delete.svg" alt="poubelle">
 </div>
